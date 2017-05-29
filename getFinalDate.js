@@ -1,4 +1,3 @@
-
 function addDays(theDate, days) {
     return new Date(theDate.getTime() + days*24*60*60*1000);
 }
@@ -11,7 +10,7 @@ function stringToTime(str) {
 	return  new Date(a.join('/'));
 }
 
-function DurationExcludingWeekends(startDate, duration, weekends) {
+function getFullListOfWeekendsDays(weekends) {
 	var weekendsArray = [];
 	for(var i = 0; i<weekends.length; i++) {
 	  var start = weekends[i].start_date;
@@ -25,19 +24,29 @@ function DurationExcludingWeekends(startDate, duration, weekends) {
 	    weekendsArray.push(start);
 	  }
 	}
-	
-	var workArray = [];
-	while(workArray.length!=duration) {
+	return weekendsArray;
+}
+
+function getWorkDays(startDate, duration, weekendsArray) {
+	var workDaysArray = [];
+	while(workDaysArray.length!=duration) {
 
     var isWeekend = weekendsArray.some(x=> x.getTime()===startDate.getTime());
 	  if (isWeekend){
 	    startDate = addDays(startDate, 1);
 	    continue;
 	  }
-	  workArray.push(startDate);
+	  workDaysArray.push(startDate);
 	  startDate = addDays(startDate, 1);
 	}
-	return workArray[workArray.length-1];
+	return workDaysArray;
+}
+
+function DurationExcludingWeekends(startDate, duration, weekends) {
+	
+	var weekendsArray = getFullListOfWeekendsDays(weekends);
+	var workDaysArray = getWorkDays(startDate, duration, weekendsArray);
+	return workDaysArray[workDaysArray.length-1];
 }
 
 function DurationExcludingWeekendsAdapter(startDate, duration, weekends) {
@@ -49,11 +58,12 @@ function DurationExcludingWeekendsAdapter(startDate, duration, weekends) {
              + finalDate.getFullYear();
 }
 
-// startDate = '21/04/2017';
-// var ob1 = {start_date: '23/04/2017', end_date: '25/04/2017'};
-// var ob2 = {start_date: '27/04/2017', end_date: '30/04/2017'};
-// weekends = [];
-// weekends.push(ob1);
-// weekends.push(ob2);
-// duration = 5;
-// console.log(DurationExcludingWeekendsAdapter(startDate, duration, weekends));
+startDate = '21/04/2017';
+var ob1 = {start_date: '23/04/2017', end_date: '25/04/2017'};
+var ob2 = {start_date: '27/04/2017', end_date: '30/04/2017'};
+weekends = [];
+weekends.push(ob1);
+weekends.push(ob2);
+duration = 5;
+console.log(DurationExcludingWeekendsAdapter(startDate, duration, weekends));
+
